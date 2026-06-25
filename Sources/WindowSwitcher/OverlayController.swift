@@ -201,8 +201,8 @@ final class OverlayController: NSObject {
         let alert = NSAlert()
         alert.messageText = "需要「辅助功能」权限"
         alert.informativeText = """
-        switch_window 需要辅助功能权限才能列出并切换其他应用的窗口。
-        请在 系统设置 ▸ 隐私与安全性 ▸ 辅助功能 中勾选 switch_window，然后再次按下快捷键。
+        WindowSwitcher 需要辅助功能权限才能列出并切换其他应用的窗口。
+        请在 系统设置 ▸ 隐私与安全性 ▸ 辅助功能 中勾选 WindowSwitcher，然后再次按下快捷键。
         """
         alert.addButton(withTitle: "打开系统设置")
         alert.addButton(withTitle: "稍后")

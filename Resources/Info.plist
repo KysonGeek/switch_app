@@ -4,9 +4,9 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>switch_window</string>
+    <string>WindowSwitcher</string>
     <key>CFBundleDisplayName</key>
-    <string>switch_window</string>
+    <string>WindowSwitcher</string>
     <key>CFBundleIdentifier</key>
     <string>com.switchapp.windowswitcher</string>
     <key>CFBundleExecutable</key>

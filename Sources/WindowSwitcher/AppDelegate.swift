@@ -71,7 +71,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         item.button?.image = NSImage(
             systemSymbolName: "rectangle.on.rectangle.angled",
-            accessibilityDescription: "switch_window")
+            accessibilityDescription: "WindowSwitcher")
 
         let menu = NSMenu()
         menu.addItem(withTitle: "打开切换器 (⌥Tab)",
@@ -82,7 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                      action: #selector(openAccessibilitySettings), keyEquivalent: "")
             .target = self
         menu.addItem(.separator())
-        menu.addItem(withTitle: "退出 switch_window",
+        menu.addItem(withTitle: "退出 WindowSwitcher",
                      action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         item.menu = menu
         statusItem = item
