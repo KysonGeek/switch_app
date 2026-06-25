@@ -54,7 +54,7 @@ private struct HeaderBar: View {
     var body: some View {
         HStack(spacing: 10) {
             logo
-            Text("窗口闪切")
+            Text("switch_window")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(.primary)
             Text(count > 0

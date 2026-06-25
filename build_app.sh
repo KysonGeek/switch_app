@@ -4,7 +4,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-APP_NAME="窗口闪切"
+APP_NAME="switch_window"
 EXEC_NAME="WindowSwitcher"
 BUILD_DIR=".build/release"
 APP_BUNDLE="${APP_NAME}.app"

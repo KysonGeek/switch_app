@@ -30,7 +30,7 @@ jobs:
         run: bash ./build_app.sh
 
       - name: Zip the app bundle
-        run: ditto -c -k --sequesterRsrc --keepParent "窗口闪切.app" WindowSwitcher.zip
+        run: ditto -c -k --sequesterRsrc --keepParent "switch_window.app" WindowSwitcher.zip
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

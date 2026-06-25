@@ -4,9 +4,9 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>窗口闪切</string>
+    <string>switch_window</string>
     <key>CFBundleDisplayName</key>
-    <string>窗口闪切</string>
+    <string>switch_window</string>
     <key>CFBundleIdentifier</key>
     <string>com.switchapp.windowswitcher</string>
     <key>CFBundleExecutable</key>
