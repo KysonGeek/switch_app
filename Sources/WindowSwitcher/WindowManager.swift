@@ -10,6 +10,7 @@ struct WindowInfo: Identifiable {
     let title: String
     let isMinimized: Bool
     let axElement: AXUIElement
+    var position: CGPoint = .zero   // top-left in screen space; used for stable ordering
 
     /// What to show under the key cap.
     var displayTitle: String {
@@ -36,7 +37,12 @@ enum WindowManager {
     ///
     /// Apps are queried in parallel: establishing the AX connection to each app is
     /// the dominant cost, so doing them concurrently turns a multi-second cold start
-    /// into a fraction of a second. Result order still follows app launch order.
+    /// into a fraction of a second.
+    ///
+    /// The result is then sorted deterministically (app name → window title → screen
+    /// position) so a given window always lands on the same key across summons —
+    /// `NSWorkspace.runningApplications` order is not stable (it shuffles with launch
+    /// and activation), which is what made key positions jump around.
     static func allWindows() -> [WindowInfo] {
         let selfPID = ProcessInfo.processInfo.processIdentifier
         let apps = NSWorkspace.shared.runningApplications.filter {
@@ -47,7 +53,18 @@ enum WindowManager {
         DispatchQueue.concurrentPerform(iterations: apps.count) { idx in
             perApp[idx] = windows(of: apps[idx])   // distinct indices → no data race
         }
-        return perApp.flatMap { $0 }
+        return perApp.flatMap { $0 }.sorted(by: stableOrder)
+    }
+
+    /// Deterministic window ordering: group by app, then title, then screen position.
+    private static func stableOrder(_ a: WindowInfo, _ b: WindowInfo) -> Bool {
+        let byApp = a.appName.localizedCaseInsensitiveCompare(b.appName)
+        if byApp != .orderedSame { return byApp == .orderedAscending }
+        let byTitle = a.displayTitle.localizedCaseInsensitiveCompare(b.displayTitle)
+        if byTitle != .orderedSame { return byTitle == .orderedAscending }
+        if a.position.y != b.position.y { return a.position.y < b.position.y }
+        if a.position.x != b.position.x { return a.position.x < b.position.x }
+        return a.pid < b.pid
     }
 
     /// Prime AX connections in the background so the first hot-key press is instant.
@@ -75,11 +92,12 @@ enum WindowManager {
     ) -> WindowInfo? {
         AXUIElementSetMessagingTimeout(win, axTimeout)
 
-        let attrs = [kAXSubroleAttribute, kAXTitleAttribute, kAXMinimizedAttribute] as CFArray
+        let attrs = [kAXSubroleAttribute, kAXTitleAttribute,
+                     kAXMinimizedAttribute, kAXPositionAttribute] as CFArray
         var raw: CFArray?
         let err = AXUIElementCopyMultipleAttributeValues(
             win, attrs, AXCopyMultipleAttributeOptions(rawValue: 0), &raw)
-        guard err == .success, let values = raw as? [AnyObject], values.count == 3 else {
+        guard err == .success, let values = raw as? [AnyObject], values.count == 4 else {
             return nil
         }
 
@@ -92,6 +110,7 @@ enum WindowManager {
 
         let title = values[1] as? String ?? ""
         let minimized = (values[2] as? Bool) ?? false
+        let position = decodePoint(values[3])
 
         return WindowInfo(
             pid: pid,
@@ -99,7 +118,16 @@ enum WindowManager {
             appIcon: app.icon,
             title: title,
             isMinimized: minimized,
-            axElement: win)
+            axElement: win,
+            position: position)
+    }
+
+    /// Decode an `AXValue` carrying a CGPoint (window position); `.zero` if unavailable.
+    private static func decodePoint(_ value: AnyObject?) -> CGPoint {
+        guard let value, CFGetTypeID(value) == AXValueGetTypeID() else { return .zero }
+        var point = CGPoint.zero
+        AXValueGetValue(value as! AXValue, .cgPoint, &point)
+        return point
     }
 
     /// Mock windows built from running apps (icons + fake titles) for UI previews. No AX needed.
