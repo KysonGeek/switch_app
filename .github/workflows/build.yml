@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:        # 允许在 Actions 页面手动触发
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select latest stable Xcode (Swift 6 toolchain)
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Show toolchain
+        run: swift --version
+
+      - name: Build (release)
+        run: swift build -c release
+
+      - name: Package .app bundle
+        # No signing certificate on CI → build_app.sh falls back to ad-hoc signing.
+        run: bash ./build_app.sh
+
+      - name: Zip the app bundle
+        run: ditto -c -k --sequesterRsrc --keepParent "窗口闪切.app" WindowSwitcher.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowSwitcher-app
+          path: WindowSwitcher.zip
+          if-no-files-found: error

@@ -1,5 +1,7 @@
 # 窗口闪切 · WindowSwitcher
 
+[![Build](https://github.com/KysonGeek/switch_app/actions/workflows/build.yml/badge.svg)](https://github.com/KysonGeek/switch_app/actions/workflows/build.yml)
+
 > 一个 macOS 菜单栏小工具：按下快捷键唤出**键盘布局**的浮层，每个按键对应一个打开的窗口，**按键即跳转**。专治 `⌘Tab` 切 App 时多窗口 App 选不到具体窗口的痛点。
 
 ![预览](assets/preview.png)
@@ -136,6 +138,12 @@ rm -rf "窗口闪切.app"
 | `--render <path>` | 用 mock 数据离屏渲染 UI 预览 PNG |
 | `--demo` | 用 mock 数据弹出浮层（仅看 UI） |
 | `--bench` | 实测窗口枚举耗时 |
+
+## 持续集成（自动构建）
+
+`.github/workflows/build.yml` 会在 **push 到 `main`、PR、或手动触发** 时，于 macOS 机器上自动 `swift build` + 打包 `.app`，并把结果压成 `WindowSwitcher.zip` 上传为构建产物（Actions 运行页 ▸ Artifacts 可下载）。
+
+> CI 上没有本地签名证书，产物用 ad-hoc 签名；下载解压后首次打开会被 Gatekeeper 拦，执行 `xattr -dr com.apple.quarantine "窗口闪切.app"` 即可。
 
 ## License
 
