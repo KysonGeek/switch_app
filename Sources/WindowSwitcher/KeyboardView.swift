@@ -41,10 +41,10 @@ struct KeyboardView: View {
                         .strokeBorder(.white.opacity(0.14), lineWidth: 1)
                 )
         )
-        .shadow(color: .black.opacity(0.38), radius: 40, y: 16)
-        // Transparent margin must exceed the shadow's reach (radius + |y| ≈ 56),
+        .shadow(color: .black.opacity(0.30), radius: 18, y: 6)
+        // Transparent margin must exceed the shadow's reach (radius + |y| ≈ 24),
         // otherwise the window's rectangular bounds clip the shadow into a hard ring.
-        .padding(70)
+        .padding(40)
     }
 }
 
