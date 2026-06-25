@@ -21,6 +21,9 @@ enum KeyboardLayout {
     static let assignmentOrder: [String] =
         Array((homeRow + topRow + bottomRow + numberRow).map { String($0) })
 
+    /// How many windows can be bound to keys (26 letters + 10 digits = 36).
+    static var capacity: Int { assignmentOrder.count }
+
     /// The static keyboard skeleton (letters + numbers only), before windows are assigned.
     private static func skeleton() -> [[KeyCap]] {
         func row(_ chars: String) -> [KeyCap] {

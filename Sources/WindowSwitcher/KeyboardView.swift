@@ -51,15 +51,22 @@ struct KeyboardView: View {
 private struct HeaderBar: View {
     let count: Int
 
+    private var tagline: String {
+        if count == 0 { return "当前没有可切换的窗口" }
+        let hidden = count - KeyboardLayout.capacity
+        if hidden > 0 {
+            return "按对应按键直达窗口 · 还有 \(hidden) 个窗口未显示（键位已用满）"
+        }
+        return "按对应按键直达窗口，多窗口 App 也能一键选中"
+    }
+
     var body: some View {
         HStack(spacing: 10) {
             logo
             Text("WindowSwitcher")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(.primary)
-            Text(count > 0
-                 ? "按对应按键直达窗口，多窗口 App 也能一键选中"
-                 : "当前没有可切换的窗口")
+            Text(tagline)
                 .font(.system(size: 12.5))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
