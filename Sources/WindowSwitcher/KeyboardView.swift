@@ -5,6 +5,7 @@ final class OverlayModel: ObservableObject {
     @Published var rows: [[KeyCap]] = []
     @Published var windowCount: Int = 0
     var onSelect: (WindowInfo) -> Void = { _ in }
+    var onClose: (WindowInfo) -> Void = { _ in }
 }
 
 private let keyWidth: CGFloat = 90
@@ -22,9 +23,10 @@ struct KeyboardView: View {
                 ForEach(Array(model.rows.enumerated()), id: \.offset) { _, row in
                     HStack(spacing: keySpacing) {
                         ForEach(row) { cap in
-                            KeyCapView(cap: cap) {
-                                if let w = cap.window { model.onSelect(w) }
-                            }
+                            KeyCapView(
+                                cap: cap,
+                                onJump: { if let w = cap.window { model.onSelect(w) } },
+                                onClose: { if let w = cap.window { model.onClose(w) } })
                         }
                     }
                 }
@@ -106,26 +108,48 @@ private struct HeaderBar: View {
 
 private struct KeyCapView: View {
     let cap: KeyCap
-    let action: () -> Void
+    let onJump: () -> Void
+    let onClose: () -> Void
     @State private var hovering = false
+    @State private var closeHovering = false
 
     var body: some View {
-        Button(action: action) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.white.opacity(hovering && cap.window != nil ? 0.16 : 0.07))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .strokeBorder(.white.opacity(hovering && cap.window != nil ? 0.45 : 0.12),
-                                          lineWidth: 1)
-                    )
-                content
+        ZStack {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.white.opacity(hovering && cap.window != nil ? 0.16 : 0.07))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(.white.opacity(hovering && cap.window != nil ? 0.45 : 0.12),
+                                      lineWidth: 1)
+                )
+            content
+        }
+        .frame(width: keyWidth, height: keyHeight)
+        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .onTapGesture { if cap.window != nil { onJump() } }
+        // Close button, top-right, for keys bound to a window.
+        .overlay(alignment: .topTrailing) {
+            if cap.window != nil {
+                closeButton.padding(5)
             }
-            .frame(width: keyWidth, height: keyHeight)
+        }
+        .onHover { hovering = $0 }
+    }
+
+    private var closeButton: some View {
+        Button(action: onClose) {
+            Image(systemName: "xmark")
+                .font(.system(size: 8, weight: .heavy))
+                .foregroundStyle(closeHovering ? .white : .white.opacity(0.85))
+                .frame(width: 17, height: 17)
+                .background(
+                    Circle().fill(closeHovering ? Color.red : Color.black.opacity(0.35)))
+                .overlay(Circle().strokeBorder(.white.opacity(0.25), lineWidth: 0.5))
         }
         .buttonStyle(.plain)
-        .disabled(cap.window == nil)
-        .onHover { hovering = $0 }
+        .help("关闭此窗口")
+        .opacity(hovering ? 1 : 0.6)
+        .onHover { closeHovering = $0 }
     }
 
     @ViewBuilder

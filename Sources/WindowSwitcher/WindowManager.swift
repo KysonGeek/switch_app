@@ -140,6 +140,17 @@ enum WindowManager {
         AXUIElementPerformAction(window.axElement, kAXRaiseAction as CFString)
     }
 
+    /// Close the given window by pressing its title-bar close button.
+    static func close(_ window: WindowInfo) {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+                window.axElement, kAXCloseButtonAttribute as CFString, &value) == .success,
+              let raw = value,
+              CFGetTypeID(raw) == AXUIElementGetTypeID() else { return }
+        let closeButton = raw as! AXUIElement
+        AXUIElementPerformAction(closeButton, kAXPressAction as CFString)
+    }
+
     // MARK: AX helpers
 
     private static func copyWindows(_ appElement: AXUIElement) -> [AXUIElement]? {

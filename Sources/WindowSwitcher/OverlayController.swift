@@ -21,6 +21,9 @@ final class OverlayController: NSObject {
         model.onSelect = { [weak self] window in
             self?.select(window)
         }
+        model.onClose = { [weak self] window in
+            self?.closeWindow(window)
+        }
     }
 
     // MARK: Toggle
@@ -178,6 +181,18 @@ final class OverlayController: NSObject {
     private func select(_ window: WindowInfo) {
         hide()
         WindowManager.activate(window)
+    }
+
+    /// Close the window and remove it from the grid, leaving the other keys in place.
+    /// The overlay stays open so several windows can be closed in a row.
+    private func closeWindow(_ window: WindowInfo) {
+        WindowManager.close(window)
+        for r in model.rows.indices {
+            for c in model.rows[r].indices where model.rows[r][c].window?.id == window.id {
+                model.rows[r][c].window = nil
+            }
+        }
+        model.windowCount = max(0, model.windowCount - 1)
     }
 
     // MARK: Permission UX
