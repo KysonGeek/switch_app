@@ -5,7 +5,6 @@ import Carbon.HIToolbox
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let overlay = OverlayController()
     private var hotKey: GlobalHotKey?
-    private var fnDoubleTap: FnDoubleTap?
     private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -52,11 +51,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             keyCode: UInt32(kVK_Tab),
             modifiers: UInt32(optionKey)
         ) { [weak self] in
-            self?.overlay.toggle()
-        }
-
-        // Double-tap Fn / 🌐 (Globe) also summons the switcher.
-        fnDoubleTap = FnDoubleTap { [weak self] in
             self?.overlay.toggle()
         }
 

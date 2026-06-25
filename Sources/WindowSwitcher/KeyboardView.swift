@@ -90,9 +90,7 @@ private struct HeaderBar: View {
 
     private var hintChip: some View {
         HStack(spacing: 5) {
-            Text("⌥Tab")
-            Text("·")
-            Text("双击 Fn")
+            Text("⌥Tab 唤起")
             Text("·")
             Text("Esc 关闭")
         }
